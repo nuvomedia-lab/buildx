@@ -22,27 +22,31 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<Tokens> {
     try {
-      const user = await this.prisma.user.findUnique({ 
+      console.log(`[LOGIN] Attempting login for email: ${email}`);
+      
+      const user: any = await this.prisma.user.findUnique({ 
         where: { email },
-        select: {
-          id: true,
-          email: true,
-          password: true,
-          role: true,
-          isActive: true,
-        } as any,
       });
+      
       if (!user) {
+        console.log(`[LOGIN] User not found for email: ${email}`);
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      console.log(`[LOGIN] User found - ID: ${user.id}, Role: ${user.role}, isActive: ${(user as any).isActive}`);
+
       // Check if user is active
       if (!(user as any).isActive) {
+        console.log(`[LOGIN] User account is deactivated for email: ${email}`);
         throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
       }
 
+      console.log(`[LOGIN] Validating password for email: ${email}`);
       const valid = await bcrypt.compare(password, user.password);
+      console.log(`[LOGIN] Password validation result: ${valid}`);
+      
       if (!valid) {
+        console.log(`[LOGIN] Invalid password for email: ${email}`);
         throw new UnauthorizedException('Invalid credentials');
       }
 
@@ -56,8 +60,10 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
 
+      console.log(`[LOGIN] Login successful for email: ${email}, role: ${user.role}`);
       return { accessToken, refreshToken, role: user.role };
     } catch (error) {
+      console.log(`[LOGIN] Login failed for email: ${email}`, error);
       if (error instanceof UnauthorizedException) {
         throw error;
       }
