@@ -18,6 +18,7 @@ async function main() {
     update: { 
       isActive: true,
       status: 'APPROVED',
+      password: passwordHash,
     } as any,
     create: {
       fullname: adminFullname,
