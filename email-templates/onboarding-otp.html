@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build X Onboarding OTP</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a1a;">
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color: #1a1a1a;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="padding: 30px 30px 0;">
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">
+                                <span style="color: #ff6b35;">B</span>
+                                <span style="color: #1a1a1a;">Build X</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 24px; font-weight: bold; color: #1e40af;">
+                                Complete Your Registration
+                            </h2>
+
+                            <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 24px; color: #333;">
+                                Hello <strong>{{fullname}}</strong>,
+                            </p>
+
+                            <p style="margin: 0 0 30px 0; font-size: 16px; line-height: 24px; color: #333;">
+                                To complete your registration on Build X, please use the following verification code:
+                            </p>
+
+                            <!-- OTP Code Box -->
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center" style="padding: 0 0 30px 0;">
+                                        <div style="background-color: #f3f4f6; border-radius: 12px; padding: 20px; display: inline-block;">
+                                            <div style="font-size: 36px; font-weight: bold; color: #1e40af; letter-spacing: 5px; font-family: 'Courier New', monospace;">
+                                                {{otp}}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin: 0 0 30px 0; font-size: 14px; line-height: 20px; color: #ff6b35;">
+                                ⏰ This code will expire in 3 minutes
+                            </p>
+
+                            <p style="margin: 0; font-size: 14px; line-height: 20px; color: #6b7280;">
+                                If you didn't request this code, please ignore this email.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #0f172a; padding: 30px;" align="center">
+                            <p style="margin: 0; font-size: 12px; color: #475569;">
+                                Copyright © 2025 Buildx.com All rights reserved.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+

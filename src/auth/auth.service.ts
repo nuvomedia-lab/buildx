@@ -9,6 +9,7 @@ import axios from 'axios';
 interface Tokens {
   accessToken: string;
   refreshToken: string;
+  role: string;
 }
 
 @Injectable()
@@ -26,6 +27,11 @@ export class AuthService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
+      // Check if user is active
+      if (!(user as any).isActive) {
+        throw new UnauthorizedException('Your account has been deactivated. Please contact support.');
+      }
+
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) {
         throw new UnauthorizedException('Invalid credentials');
@@ -41,7 +47,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
 
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, role: user.role };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
@@ -81,7 +87,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
 
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, role: user.role };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
@@ -135,7 +141,7 @@ export class AuthService {
         expiresIn: '7d',
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, role: user.role };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Unable to sign in with Google');
@@ -208,7 +214,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
   
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, role: user.role } as Tokens;
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Unable to sign in with Microsoft');

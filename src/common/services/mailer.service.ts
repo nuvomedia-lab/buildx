@@ -27,8 +27,8 @@ export class MailerService {
 
     const payload = {
       from: {
-        address: this.configService.get<string>('MAIL_FROM') || 'noreply@buildx.app',
-        name: 'BuildX',
+        address: this.configService.get<string>('ZEPTO_FROM') || this.configService.get<string>('MAIL_FROM') || 'noreply@buildx.app',
+        name: this.configService.get<string>('ZEPTO_FROM_NAME') || 'BuildX',
       },
       to: [
         {

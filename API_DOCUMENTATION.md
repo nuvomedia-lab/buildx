@@ -70,6 +70,223 @@ Content-Type: application/json
 }
 ```
 
+### Admin Members Endpoints
+
+#### Send Invitation to Member
+
+**Endpoint:** `POST /adminmembers/invite`
+
+**Description:** Invites a new member to join BuildX by creating a user account and sending an email invitation. The invited member will receive an email with an invitation token and temporary password.
+
+**Authentication:** Not required (but should be protected in production)
+
+**Request:**
+```http
+POST /adminmembers/invite HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "email": "member@example.com",
+  "phoneNumber": "+1234567890",
+  "role": "PM",
+  "activities": ["activity1", "activity2"],
+  "fullname": "John Doe"
+}
+```
+
+**Request Fields:**
+- `email` (required): The email address of the member to invite
+- `phoneNumber` (optional): The phone number of the member
+- `role` (required): The role of the member (PM, QS, SEF, SK, PROC, ACC, AD)
+  - `PM`: Project Manager
+  - `QS`: Quantity Surveyor
+  - `SEF`: Site Engineer/Foreman
+  - `SK`: Store Keeper
+  - `PROC`: Procurement
+  - `ACC`: Accountant
+  - `AD`: Admin
+- `activities` (optional): Array of activities the member has access to. Leave empty or include "ALL" for full access
+- `fullname` (optional): The full name of the member
+
+**Response:**
+
+**Success Response (200 OK):**
+```json
+{
+  "message": "Invitation sent successfully",
+  "userId": 123,
+  "email": "member@example.com"
+}
+```
+
+**Error Response (409 Conflict):**
+```json
+{
+  "statusCode": 409,
+  "message": "User with this email already exists"
+}
+```
+
+**Error Response (400 Bad Request):**
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid input"
+}
+```
+
+**Notes:**
+- The invited member will receive an email with an invitation token and temporary password
+- The email contains a link to complete registration
+- The user account is created with `PENDING` approval status
+- Environment variables:
+  - `ZEPTO_INVITE_TEMPLATE_ID`: Email template ID for member invitations
+  - `FRONTEND_URL`: Frontend URL for registration completion
+
+### Onboarding Endpoints
+
+The onboarding flow allows invited members to complete their registration in 5 steps.
+
+#### Step 1: Send OTP
+
+**Endpoint:** `POST /onboarding/send-otp`
+
+**Description:** Sends a 6-digit OTP to the user's email after they click the invitation link.
+
+**Request Body:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response:**
+```json
+{
+  "message": "OTP sent to your email",
+  "email": "user@example.com"
+}
+```
+
+**Notes:**
+- OTP expires in 3 minutes
+- Token from invitation email should be used
+
+---
+
+#### Step 2: Verify OTP
+
+**Endpoint:** `POST /onboarding/verify-otp`
+
+**Description:** Verifies the OTP code entered by the user.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "otp": "123456"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "OTP verified successfully",
+  "onboardingToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+---
+
+#### Step 3: Set Password
+
+**Endpoint:** `POST /onboarding/set-password`
+
+**Description:** Sets the user's password.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "confirmPassword": "SecurePassword123!"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Password set successfully",
+  "email": "user@example.com"
+}
+```
+
+---
+
+#### Step 4: Save Personal Details
+
+**Endpoint:** `POST /onboarding/personal-details`
+
+**Description:** Saves first name, last name, and avatar URL.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "avatarUrl": "https://res.cloudinary.com/..."
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Personal details saved successfully",
+  "email": "user@example.com",
+  "fullname": "John Doe"
+}
+```
+
+---
+
+#### Step 5: Confirm Details
+
+**Endpoint:** `POST /onboarding/confirm`
+
+**Description:** Final step to confirm all details and complete registration.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Registration completed successfully",
+  "email": "user@example.com",
+  "fullname": "John Doe",
+  "role": "PM",
+  "status": "APPROVED"
+}
+```
+
+---
+
+**Onboarding Flow:**
+1. User clicks invitation link → send-otp
+2. User enters OTP → verify-otp
+3. User sets password → set-password
+4. User uploads image (Cloudinary), then saves details → personal-details
+5. User confirms → confirm
+
 ## Response Formats
 
 ### Success Response Format

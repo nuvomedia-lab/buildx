@@ -18,7 +18,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful', type: BaseResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid credentials', type: BaseResponseDto })
-  async login(@Body() dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async login(@Body() dto: LoginDto): Promise<{ accessToken: string; refreshToken: string; role: string }> {
     try {
       const tokens = await this.authService.login(dto.email, dto.password);
       return tokens;
