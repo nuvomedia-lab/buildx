@@ -22,7 +22,16 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<Tokens> {
     try {
-      const user = await this.prisma.user.findUnique({ where: { email } });
+      const user = await this.prisma.user.findUnique({ 
+        where: { email },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          role: true,
+          isActive: true,
+        } as any,
+      });
       if (!user) {
         throw new UnauthorizedException('Invalid credentials');
       }
