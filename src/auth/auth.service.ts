@@ -6,10 +6,23 @@ import * as bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import axios from 'axios';
 
-interface Tokens {
+export interface Tokens {
   accessToken: string;
   refreshToken: string;
   role: string;
+  user: {
+    id: number;
+    fullname: string;
+    email: string;
+    phoneNumber?: string | null;
+    avatarUrl?: string | null;
+    role: string;
+    activities: string[];
+    status: string;
+    isActive: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+  };
 }
 
 @Injectable()
@@ -60,8 +73,22 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
 
+      const safeUser = {
+        id: user.id,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber ?? null,
+        avatarUrl: user.avatarUrl ?? null,
+        role: user.role,
+        activities: user.activities,
+        status: user.status,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+
       console.log(`[LOGIN] Login successful for email: ${email}, role: ${user.role}`);
-      return { accessToken, refreshToken, role: user.role };
+      return { accessToken, refreshToken, role: user.role, user: safeUser };
     } catch (error) {
       console.log(`[LOGIN] Login failed for email: ${email}`, error);
       if (error instanceof UnauthorizedException) {
@@ -102,7 +129,20 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
 
-      return { accessToken, refreshToken, role: user.role };
+      const safeUser = {
+        id: user.id,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber ?? null,
+        avatarUrl: user.avatarUrl ?? null,
+        role: user.role,
+        activities: user.activities,
+        status: user.status,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+      return { accessToken, refreshToken, role: user.role, user: safeUser };
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
@@ -156,7 +196,20 @@ export class AuthService {
         expiresIn: '7d',
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
-      return { accessToken, refreshToken, role: user.role };
+      const safeUser = {
+        id: user.id,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber ?? null,
+        avatarUrl: user.avatarUrl ?? null,
+        role: user.role,
+        activities: user.activities,
+        status: user.status,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+      return { accessToken, refreshToken, role: user.role, user: safeUser };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Unable to sign in with Google');
@@ -183,7 +236,7 @@ export class AuthService {
     return `${base}?${params.toString()}`;
   }
   
-  async handleMicrosoftCallback(code: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async handleMicrosoftCallback(code: string): Promise<Tokens> {
     try {
       const clientId = process.env.MS_CLIENT_ID;
       const clientSecret = process.env.MS_CLIENT_SECRET;
@@ -229,7 +282,21 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET || 'dev_secret_change_me',
       });
   
-      return { accessToken, refreshToken, role: user.role } as Tokens;
+      const safeUser = {
+        id: user.id,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber ?? null,
+        avatarUrl: user.avatarUrl ?? null,
+        role: user.role,
+        activities: user.activities,
+        status: user.status,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      };
+
+      return { accessToken, refreshToken, role: user.role, user: safeUser };
     } catch (error) {
       if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Unable to sign in with Microsoft');

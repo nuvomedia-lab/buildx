@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthService } from './auth.service';
+import { AuthService, Tokens } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { BaseResponseDto } from '../common/dto/base-response.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -18,7 +18,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Login successful', type: BaseResponseDto })
   @ApiResponse({ status: 401, description: 'Invalid credentials', type: BaseResponseDto })
-  async login(@Body() dto: LoginDto): Promise<{ accessToken: string; refreshToken: string; role: string }> {
+  async login(@Body() dto: LoginDto): Promise<Tokens> {
     try {
       const tokens = await this.authService.login(dto.email, dto.password);
       return tokens;
@@ -33,7 +33,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign in with Google ID token' })
   @ApiResponse({ status: 200, description: 'Login successful', type: BaseResponseDto })
   @ApiResponse({ status: 401, description: 'Unauthorized', type: BaseResponseDto })
-  async google(@Body() dto: GoogleSignInDto): Promise<{ accessToken: string; refreshToken: string }> {
+  async google(@Body() dto: GoogleSignInDto): Promise<Tokens> {
     try {
       return await this.authService.googleSignIn(dto.idToken);
     } catch (error) {
@@ -57,7 +57,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Handle Google OAuth callback (server-side)' })
   @ApiResponse({ status: 200, description: 'Login successful', type: BaseResponseDto })
-  async googleCallback(@Body('code') code: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async googleCallback(@Body('code') code: string): Promise<Tokens> {
     try {
       return await this.authService.handleGoogleCallback(code);
     } catch (error) {
@@ -81,7 +81,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Handle Microsoft OAuth callback (server-side)' })
   @ApiResponse({ status: 200, description: 'Login successful', type: BaseResponseDto })
-  async microsoftCallback(@Body('code') code: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async microsoftCallback(@Body('code') code: string): Promise<Tokens> {
     try {
       return await this.authService.handleMicrosoftCallback(code);
     } catch (error) {
