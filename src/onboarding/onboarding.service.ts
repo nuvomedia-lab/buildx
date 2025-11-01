@@ -3,12 +3,14 @@ import { PrismaService } from '../prisma/prisma.service';
 import { MailerService } from '../common/services/mailer.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
-import { ApprovalStatus } from '@prisma/client';
+import { ApprovalStatus, Role } from '@prisma/client';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { SetPasswordDto } from './dto/set-password.dto';
 import { PersonalDetailsDto } from './dto/personal-details.dto';
 import { ConfirmDetailsDto } from './dto/confirm-details.dto';
+import { GetMemberDetailsDto } from './dto/get-member-details.dto';
+import { getActivitiesForRole } from '../adminmembers/activities.config';
 
 @Injectable()
 export class OnboardingService {
@@ -217,6 +219,67 @@ export class OnboardingService {
       if (error instanceof NotFoundException || error instanceof BadRequestException) throw error;
       throw new BadRequestException('Failed to confirm details');
     }
+  }
+
+  async getMemberDetails(dto: GetMemberDetailsDto) {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { email: dto.email },
+      });
+
+      if (!user) {
+        throw new NotFoundException('Member not found');
+      }
+
+      // Get role display name
+      const roleDisplayName = this.getRoleDisplayName(user.role);
+
+      // Determine access level
+      let accessLevel = 'Limited';
+      if (user.activities.includes('ALL ACCESS')) {
+        accessLevel = 'Full';
+      } else {
+        const allowedActivities = getActivitiesForRole(user.role);
+        const hasAllActivities = allowedActivities.every((activity) =>
+          user.activities.includes(activity),
+        );
+        if (hasAllActivities && user.activities.length === allowedActivities.length) {
+          accessLevel = 'Full';
+        }
+      }
+
+      // Split fullname into first and last name
+      const nameParts = user.fullname.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      return {
+        role: roleDisplayName,
+        accessLevel,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        firstName,
+        lastName,
+        image: user.avatarUrl,
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) throw error;
+      throw new BadRequestException(`Failed to get member details: ${error.message}`);
+    }
+  }
+
+  private getRoleDisplayName(role: Role): string {
+    const displayNames: Record<Role, string> = {
+      PM: 'Project Manager',
+      QS: 'Quantity Surveyor',
+      SEF: 'Site Engineer/Foreman',
+      SK: 'Store Keeper',
+      PROC: 'Procurement',
+      ACC: 'Accountant',
+      AD: 'Admin',
+    };
+
+    return displayNames[role];
   }
 }
 

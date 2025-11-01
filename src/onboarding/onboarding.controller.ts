@@ -6,6 +6,8 @@ import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { SetPasswordDto } from './dto/set-password.dto';
 import { PersonalDetailsDto } from './dto/personal-details.dto';
 import { ConfirmDetailsDto } from './dto/confirm-details.dto';
+import { GetMemberDetailsDto } from './dto/get-member-details.dto';
+import { MemberDetailsResponseDto } from './dto/member-details-response.dto';
 import { BaseResponseDto } from '../common/dto/base-response.dto';
 
 @ApiTags('onboarding')
@@ -73,6 +75,19 @@ export class OnboardingController {
   async confirmDetails(@Body() dto: ConfirmDetailsDto) {
     try {
       return await this.onboardingService.confirmDetails(dto);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('member-details')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Get member details by email' })
+  @ApiResponse({ status: 200, description: 'Member details retrieved successfully', type: MemberDetailsResponseDto })
+  @ApiResponse({ status: 404, description: 'Member not found', type: BaseResponseDto })
+  async getMemberDetails(@Body() dto: GetMemberDetailsDto) {
+    try {
+      return await this.onboardingService.getMemberDetails(dto);
     } catch (error) {
       throw error;
     }

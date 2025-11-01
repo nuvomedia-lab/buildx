@@ -4,6 +4,8 @@ import { AdminMembersService } from './adminmembers.service';
 import { AdminMembersController } from './adminmembers.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { CommonModule } from '../common/common.module';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../common/guards/roles.guard';
 
 @Module({
   imports: [
@@ -15,7 +17,7 @@ import { CommonModule } from '../common/common.module';
     }),
   ],
   controllers: [AdminMembersController],
-  providers: [AdminMembersService],
+  providers: [AdminMembersService, JwtAuthGuard, RolesGuard],
   exports: [AdminMembersService],
 })
 export class AdminMembersModule {}
