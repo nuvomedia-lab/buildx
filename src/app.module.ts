@@ -7,9 +7,10 @@ import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminMembersModule } from './adminmembers/adminmembers.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, CommonModule, AuthModule, AdminMembersModule, OnboardingModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), PrismaModule, CommonModule, AuthModule, AdminMembersModule, OnboardingModule, CloudinaryModule],
   controllers: [AppController],
   providers: [AppService],
 })

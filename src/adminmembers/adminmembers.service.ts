@@ -93,7 +93,7 @@ export class AdminMembersService {
       });
 
       // Send invitation email
-      const inviteUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/complete-registration?token=${invitationToken}`;
+      const inviteUrl = `${process.env.FRONTEND_URL || 'http://localhost:5174'}/auth/create-password?token=${invitationToken}`;
       
       // Only send email if Zeptomail is configured
       if (process.env.ZEPTO_PASSWORD) {
@@ -157,7 +157,11 @@ export class AdminMembersService {
   }
 
   async getAllMembers(query: GetMembersQueryDto) {
-    const { page = 1, limit = 10, search, role } = query;
+    // Ensure page and limit are numbers (query params come as strings)
+    const page = typeof query.page === 'string' ? parseInt(query.page, 10) : (query.page ?? 1);
+    const limit = typeof query.limit === 'string' ? parseInt(query.limit, 10) : (query.limit ?? 10);
+    const search = query.search;
+    const role = query.role;
     const skip = (page - 1) * limit;
 
     // Build where clause
